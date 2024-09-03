@@ -18,12 +18,14 @@ const profileRoute: RouteRecordStringComponent[] = [
       title: $t('widgets.profile'),
     },
     name: 'Profile',
-    path: '',
+    path: '/',
+    redirect: '/profile',
     children: [
       {
         component: '/_core/profile/index',
         meta: {
           icon: 'mingcute:profile-line',
+          keepAlive: true,
           title: $t('widgets.profile'),
         },
         name: 'ProfileIndex',
