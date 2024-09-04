@@ -93,14 +93,30 @@ const formState = reactive({
 });
 
 /**
+ * oauth登录 需要tenantId参数
+ */
+watch(
+  () => formState.tenantId,
+  (tenantId) => {
+    localStorage.setItem('__oauth_tenant_id', tenantId);
+  },
+  {
+    immediate: true,
+  },
+);
+
+/**
  * 默认选中第一项租户
  */
-const stop = watch(props.tenantOptions, (options) => {
-  if (options.length > 0) {
-    formState.tenantId = options[0]!.tenantId;
-    stop();
-  }
-});
+const stop = watch(
+  () => props.tenantOptions,
+  (options) => {
+    if (options.length > 0) {
+      formState.tenantId = options[0]!.tenantId;
+      stop();
+    }
+  },
+);
 
 const usernameStatus = computed(() => {
   return formState.submitted && !formState.username ? 'error' : 'default';
