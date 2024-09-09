@@ -25,14 +25,13 @@ import { uploadApi, type UploadResult } from '#/api/core/upload';
 import { buildShortUUID } from '#/utils/uuid';
 
 import { bindHandlers } from './helper';
-import ImgUpload from './ImgUpload.vue';
+import ImgUpload from './img-upload.vue';
 import {
   plugins as defaultPlugins,
   toolbar as defaultToolbar,
 } from './tinymce';
 
-// eslint-disable-next-line vue/order-in-components
-defineOptions({ inheritAttrs: false, name: 'Tinymce' });
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
   height: {
