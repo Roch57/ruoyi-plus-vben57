@@ -22,6 +22,7 @@
     }
   },
   "dependencies": {
+    "@vben/prettier-config": "file:",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6"
   }
