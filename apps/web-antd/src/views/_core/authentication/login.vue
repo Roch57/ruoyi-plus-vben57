@@ -1,15 +1,16 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import type { VbenFormSchema } from '@vben/common-ui';
 
-import { AuthenticationLogin } from '@vben/common-ui';
+import { computed, onMounted, ref } from 'vue';
+
+import { AuthenticationLogin, z } from '@vben/common-ui';
+import { $t } from '@vben/locales';
 
 import { omit } from 'lodash-es';
 
 import { tenantList, type TenantResp } from '#/api';
 import { captchaImage, type CaptchaResponse } from '#/api/core/captcha';
 import { useAuthStore } from '#/store';
-
-import OauthLogin from './oauth-login.vue';
 
 defineOptions({ name: 'Login' });
 
@@ -39,9 +40,75 @@ async function loadTenant() {
   tenantInfo.value = resp;
 }
 
-onMounted(() => {
-  loadCaptcha();
-  loadTenant();
+onMounted(async () => {
+  await loadCaptcha();
+  await loadTenant();
+});
+
+const formSchema = computed((): VbenFormSchema[] => {
+  return [
+    {
+      component: 'VbenSelect',
+      componentProps: {
+        class: 'tenant-picker',
+        options: tenantInfo.value.voList.map((item) => ({
+          label: item.companyName,
+          value: item.tenantId,
+        })),
+        placeholder: $t('authentication.selectAccount'),
+        valueprop: 'tenantId',
+      },
+      dependencies: {
+        trigger(values, _form) {
+          console.log(values);
+        },
+        triggerFields: [''],
+      },
+      fieldName: 'tenantId',
+      label: $t('authentication.selectAccount'),
+      rules: z
+        .string()
+        .min(1, { message: $t('authentication.selectAccount') })
+        .optional()
+        .default('000000'),
+    },
+    {
+      component: 'VbenInput',
+      componentProps: {
+        class: 'login-input',
+        placeholder: $t('authentication.usernameTip'),
+      },
+      fieldName: 'username',
+      label: $t('authentication.username'),
+      rules: z.string().min(1, { message: $t('authentication.usernameTip') }),
+    },
+    {
+      component: 'VbenInputPassword',
+      componentProps: {
+        class: 'login-input',
+        placeholder: $t('authentication.password'),
+      },
+      fieldName: 'password',
+      label: $t('authentication.password'),
+      rules: z.string().min(6, { message: $t('authentication.passwordTip') }),
+    },
+    {
+      component: 'VbenInputCaptcha',
+      componentProps: {
+        captcha: captchaInfo.value.img,
+        class: 'login-input',
+        onCaptchaClick: loadCaptcha,
+        placeholder: $t('authentication.code'),
+      },
+      dependencies: {
+        if: () => captchaInfo.value.captchaEnabled,
+        triggerFields: [''],
+      },
+      fieldName: 'code',
+      label: $t('authentication.code'),
+      rules: z.string().min(1, { message: $t('authentication.codeTip') }),
+    },
+  ];
 });
 
 interface LoginForm {
@@ -52,7 +119,6 @@ interface LoginForm {
   username: string;
 }
 
-const loginRef = ref<InstanceType<typeof AuthenticationLogin>>();
 async function handleAccountLogin(values: LoginForm) {
   try {
     const requestParam: any = omit(values, ['code']);
@@ -68,7 +134,7 @@ async function handleAccountLogin(values: LoginForm) {
     // 处理验证码错误
     if (error instanceof Error) {
       // 刷新验证码
-      loginRef.value?.resetCaptcha();
+      // todo
     }
   }
 }
@@ -76,18 +142,28 @@ async function handleAccountLogin(values: LoginForm) {
 
 <template>
   <AuthenticationLogin
-    ref="loginRef"
-    :captcha-base64="captchaInfo.img"
+    :form-schema="formSchema"
     :loading="authStore.loginLoading"
-    :show-register="false"
-    :tenant-options="tenantInfo.voList"
-    :use-captcha="captchaInfo.captchaEnabled"
-    :use-tenant="tenantInfo.tenantEnabled"
-    @captcha-click="loadCaptcha"
     @submit="handleAccountLogin"
-  >
-    <template #third-party-login>
-      <OauthLogin />
-    </template>
-  </AuthenticationLogin>
+  />
 </template>
+
+<style lang="scss">
+/**
+  tenant-picker 跟下面的输入框样式保持一致
+*/
+.tenant-picker {
+  height: 40px;
+  background-color: hsl(var(--input-background));
+
+  &:focus {
+    @apply border-primary;
+  }
+}
+
+.login-input {
+  &:focus {
+    @apply border-primary;
+  }
+}
+</style>
