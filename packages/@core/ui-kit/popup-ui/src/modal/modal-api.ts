@@ -41,6 +41,7 @@ export class ModalApi {
       isOpen: false,
       loading: false,
       modal: true,
+      openAutoFocus: false,
       showCancelButton: true,
       showConfirmButton: true,
       title: '',
@@ -96,6 +97,14 @@ export class ModalApi {
 
   getData<T extends object = Record<string, any>>() {
     return (this.sharedData?.payload ?? {}) as T;
+  }
+
+  modalLoading(loading: boolean) {
+    this.store.setState((prev) => ({
+      ...prev,
+      confirmLoading: loading,
+      loading,
+    }));
   }
 
   /**
