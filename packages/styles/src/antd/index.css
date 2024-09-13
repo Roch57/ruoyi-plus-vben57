@@ -11,3 +11,7 @@
 .ant-notification-notice {
   @apply dark:border-border/60 dark:border;
 }
+
+:root {
+  --ad-border-radius: 5px;
+}
