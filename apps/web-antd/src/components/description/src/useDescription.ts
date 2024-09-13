@@ -18,17 +18,25 @@ export function useDescription(
   const loaded = ref(false);
 
   function register(instance: DescInstance) {
-    if (unref(loaded) && import.meta.env.PROD) {
-      return;
-    }
+    // if (unref(loaded) && import.meta.env.PROD) {
+    //   return;
+    // }
     desc.value = instance;
     props && instance.setDescProps(props);
     loaded.value = true;
   }
 
   const methods: DescInstance = {
-    setDescProps: (descProps: Partial<DescriptionProps>): void => {
-      unref(desc)?.setDescProps(descProps);
+    setDescProps: (
+      descProps: Partial<DescriptionProps>,
+      delay = false,
+    ): void => {
+      if (!delay) {
+        unref(desc)?.setDescProps(descProps);
+        return;
+      }
+      // 奇怪的问题 在modal中需要setTimeout才会生效
+      setTimeout(() => unref(desc)?.setDescProps(descProps));
     },
   };
 

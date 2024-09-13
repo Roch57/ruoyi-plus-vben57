@@ -5,7 +5,8 @@ import { useVbenModal } from '@vben/common-ui';
 import { $t } from '@vben/locales';
 
 import { useVbenForm } from '#/adapter';
-import { configAdd, configUpdate } from '#/api/system/config';
+import { noticeAdd, noticeUpdate } from '#/api/system/notice';
+import { Tinymce } from '#/components/tinymce';
 
 import { modalSchema } from './data';
 
@@ -22,11 +23,10 @@ const title = computed(() => {
 });
 
 const [BasicForm, formApi] = useVbenForm({
-  commonConfig: {
-    labelWidth: 80,
-  },
+  layout: 'vertical',
   schema: modalSchema(),
   showDefaultActions: false,
+  wrapperClass: 'grid-cols-2',
 });
 
 const [BasicModal, modalApi] = useVbenModal({
@@ -58,7 +58,7 @@ async function handleConfirm() {
     }
     const data = await formApi.getValues();
     console.log(data);
-    await (isUpdate.value ? configUpdate(data) : configAdd(data));
+    await (isUpdate.value ? noticeUpdate(data) : noticeAdd(data));
     emit('reload');
     await handleCancel();
   } catch (error) {
@@ -75,7 +75,11 @@ async function handleCancel() {
 </script>
 
 <template>
-  <BasicModal :title="title" class="w-[550px]">
-    <BasicForm />
+  <BasicModal :fullscreen-button="true" :title="title" class="w-[800px]">
+    <BasicForm>
+      <template #noticeContent="slotProps">
+        <Tinymce v-bind="slotProps" width="100%" />
+      </template>
+    </BasicForm>
   </BasicModal>
 </template>
