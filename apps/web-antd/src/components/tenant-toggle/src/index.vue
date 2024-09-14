@@ -113,3 +113,12 @@ function filterOption(input: string, option: TenantOption) {
     </Select>
   </div>
 </template>
+
+<style lang="scss" scoped>
+// 当选中时 添加border样式
+:deep(.ant-select-selector) {
+  &:has(.ant-select-selection-item) {
+    box-shadow: 0 0 10px hsl(var(--primary));
+  }
+}
+</style>
