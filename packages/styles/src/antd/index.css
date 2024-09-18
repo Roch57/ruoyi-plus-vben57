@@ -15,3 +15,7 @@
 .ant-app .form-valid-error .ant-select-selector {
   border-color: hsl(var(--destructive));
 }
+
+:root {
+  --ad-border-radius: 5px;
+}
