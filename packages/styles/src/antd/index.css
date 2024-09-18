@@ -12,6 +12,6 @@
   @apply dark:border-border/60 dark:border;
 }
 
-:root {
-  --ad-border-radius: 5px;
+.ant-app .form-valid-error .ant-select-selector {
+  border-color: hsl(var(--destructive));
 }
