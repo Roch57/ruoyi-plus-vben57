@@ -1,4 +1,5 @@
 import { DictEnum } from '@vben/constants';
+import { getPopupContainer } from '@vben/utils';
 
 import { type FormSchemaGetter, z } from '#/adapter';
 import { getDictOptions } from '#/utils/dict';
@@ -41,10 +42,14 @@ export const drawerSchema: FormSchemaGetter = () => [
   },
   {
     component: 'TreeSelect',
-    componentProps: { class: 'w-full', placeholder: '请选择' },
+    componentProps: {
+      class: 'w-full',
+      getPopupContainer,
+      placeholder: '请选择',
+    },
     fieldName: 'deptId',
     label: '所属部门',
-    rules: 'required',
+    rules: 'selectRequired',
   },
   {
     component: 'Input',
@@ -95,6 +100,7 @@ export const drawerSchema: FormSchemaGetter = () => [
     component: 'Select',
     componentProps: {
       class: 'w-full',
+      getPopupContainer,
       placeholder: '请选择',
     },
     fieldName: 'postIds',
@@ -104,6 +110,7 @@ export const drawerSchema: FormSchemaGetter = () => [
     component: 'Select',
     componentProps: {
       class: 'w-full',
+      getPopupContainer,
       placeholder: '请选择',
     },
     fieldName: 'roleIds',

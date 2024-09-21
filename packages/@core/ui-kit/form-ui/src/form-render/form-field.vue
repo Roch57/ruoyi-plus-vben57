@@ -95,7 +95,7 @@ const shouldRequired = computed(() => {
   }
 
   if (isString(currentRules.value)) {
-    return currentRules.value === 'required';
+    return ['required', 'selectRequired'].includes(currentRules.value);
   }
 
   let isOptional = currentRules?.value?.isOptional?.();
@@ -264,7 +264,7 @@ function createComponentProps(slotProps: Record<string, any>) {
             <component
               :is="fieldComponent"
               :class="{
-                'border-destructive focus:border-destructive hover:border-destructive/80':
+                'border-destructive focus:border-destructive hover:border-destructive/80 focus:shadow-[0_0_0_2px_rgba(255,38,5,0.06)]':
                   isInValid,
               }"
               v-bind="createComponentProps(slotProps)"
