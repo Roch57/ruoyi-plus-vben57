@@ -3,11 +3,11 @@ import { computed, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
 import { $t } from '@vben/locales';
-import { addFullName } from '@vben/utils';
+
+import { Card, Tree } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter';
-import { postAdd, postInfo, postUpdate } from '#/api/system/post';
-import { getDeptTree } from '#/api/system/user';
+import { clientAdd, clientInfo, clientUpdate } from '#/api/system/client';
 
 import { drawerSchema } from './data';
 
@@ -27,26 +27,32 @@ const [BasicForm, formApi] = useVbenForm({
   commonConfig: {
     formItemClass: 'col-span-2',
   },
+  layout: 'vertical',
   schema: drawerSchema(),
   showDefaultActions: false,
   wrapperClass: 'grid-cols-2',
 });
 
-async function setupDeptSelect() {
-  const deptTree = await getDeptTree();
-  // 选中后显示在输入框的值 即父节点 / 子节点
-  addFullName(deptTree, 'label', ' / ');
+function setupForm(update: boolean) {
   formApi.updateSchema([
     {
-      componentProps: {
-        fieldNames: { label: 'label', value: 'id' },
-        treeData: deptTree,
-        treeDefaultExpandAll: true,
-        treeLine: { showLeafIcon: false },
-        // 选中后显示在输入框的值
-        treeNodeLabelProp: 'fullName',
+      dependencies: {
+        show: () => update,
+        triggerFields: [''],
       },
-      fieldName: 'deptId',
+      fieldName: 'clientId',
+    },
+    {
+      componentProps: {
+        disabled: update,
+      },
+      fieldName: 'clientKey',
+    },
+    {
+      componentProps: {
+        disabled: update,
+      },
+      fieldName: 'clientSecret',
     },
   ]);
 }
@@ -62,10 +68,19 @@ const [BasicDrawer, drawerApi] = useVbenDrawer({
     const { id, update } = drawerApi.getData() as DrawerProps;
     isUpdate.value = update;
     // 初始化
-    await setupDeptSelect();
-    // 更新 && 赋值
+    setupForm(update);
     if (update && id) {
-      const record = await postInfo(id);
+      const record = await clientInfo(id);
+      // 不能禁用id为1的记录
+      formApi.updateSchema([
+        {
+          componentProps: {
+            disabled: record.id === 1,
+          },
+          fieldName: 'status',
+        },
+      ]);
+
       for (const key in record) {
         await formApi.setFieldValue(key, record[key as keyof typeof record]);
       }
@@ -82,7 +97,7 @@ async function handleConfirm() {
       return;
     }
     const data = await formApi.getValues();
-    await (isUpdate.value ? postUpdate(data) : postAdd(data));
+    await (isUpdate.value ? clientUpdate(data) : clientAdd(data));
     emit('reload');
     await handleCancel();
   } catch (error) {
@@ -100,6 +115,22 @@ async function handleCancel() {
 
 <template>
   <BasicDrawer :close-on-click-modal="false" :title="title" class="w-[600px]">
-    <BasicForm />
+    <BasicForm>
+      <template #menuIds="slotProps">
+        <Card class="w-full">
+          <Tree v-bind="slotProps" />
+        </Card>
+      </template>
+    </BasicForm>
   </BasicDrawer>
 </template>
+
+<style lang="scss" scoped>
+/**
+自定义组件校验失败样式
+*/
+:deep(.form-valid-error .ant-input[name='clientSecret']) {
+  border-color: hsl(var(--destructive));
+  box-shadow: 0 0 0 2px rgb(255 38 5 / 6%);
+}
+</style>
