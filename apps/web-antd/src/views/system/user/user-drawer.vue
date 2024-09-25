@@ -5,7 +5,7 @@ import { computed, h, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
 import { $t } from '@vben/locales';
-import { addFullName, getPopupContainer } from '@vben/utils';
+import { addFullName, cloneDeep, getPopupContainer } from '@vben/utils';
 
 import { Tag } from 'ant-design-vue';
 
@@ -37,11 +37,6 @@ const [BasicForm, formApi] = useVbenForm({
   showDefaultActions: false,
   wrapperClass: 'grid-cols-2',
 });
-
-interface DrawerProps {
-  update: boolean;
-  id?: number | string;
-}
 
 /**
  * 生成角色的自定义label
@@ -130,13 +125,13 @@ const [BasicDrawer, drawerApi] = useVbenDrawer({
       return null;
     }
     drawerApi.drawerLoading(true);
-    const { id, update } = drawerApi.getData() as DrawerProps;
-    isUpdate.value = update;
+    const { id } = drawerApi.getData() as { id?: number | string };
+    isUpdate.value = !!id;
     /** update时 禁用用户名修改 不显示密码框 */
     formApi.updateSchema([
-      { componentProps: { disabled: update }, fieldName: 'userName' },
+      { componentProps: { disabled: isUpdate.value }, fieldName: 'userName' },
       {
-        dependencies: { show: () => !update, triggerFields: ['id'] },
+        dependencies: { show: () => !isUpdate.value, triggerFields: ['id'] },
         fieldName: 'password',
       },
     ]);
@@ -160,13 +155,13 @@ const [BasicDrawer, drawerApi] = useVbenDrawer({
     // 部门选择
     await setupDeptSelect();
     if (user) {
-      for (const key in user) {
+      await Promise.all([
         // 添加基础信息
-        await formApi.setFieldValue(key, user[key as keyof typeof user]);
-      }
-      // 添加角色和岗位
-      await formApi.setFieldValue('postIds', postIds);
-      await formApi.setFieldValue('roleIds', roleIds);
+        formApi.setValues(user),
+        // 添加角色和岗位
+        formApi.setFieldValue('postIds', postIds),
+        formApi.setFieldValue('roleIds', roleIds),
+      ]);
     }
     drawerApi.drawerLoading(false);
   },
@@ -179,8 +174,7 @@ async function handleConfirm() {
     if (!valid) {
       return;
     }
-    const data = await formApi.getValues();
-    console.log(data);
+    const data = cloneDeep(await formApi.getValues());
     await (isUpdate.value ? userUpdate(data) : userAdd(data));
     emit('reload');
     await handleCancel();

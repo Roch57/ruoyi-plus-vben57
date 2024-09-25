@@ -1,6 +1,6 @@
 import type { FormSchemaGetter } from '#/adapter';
 
-export const schema: FormSchemaGetter = () => [
+export const querySchema: FormSchemaGetter = () => [
   {
     component: 'Input',
     componentProps: {
@@ -21,7 +21,7 @@ export const drawerSchema: FormSchemaGetter = () => [
     fieldName: 'packageId',
   },
   {
-    component: 'Input',
+    component: 'Radio',
     dependencies: {
       show: () => false,
       triggerFields: [''],
@@ -50,6 +50,7 @@ export const drawerSchema: FormSchemaGetter = () => [
     },
     fieldName: 'remark',
     formItemClass: 'items-baseline',
+    label: '备注',
   },
 ];
 

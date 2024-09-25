@@ -17,6 +17,8 @@ import {
   StateHandler,
 } from '@vben-core/shared/utils';
 
+import { objectPick } from '@vueuse/core';
+
 const merge = createMerge((originObj, key, updates) => {
   if (Array.isArray(originObj[key]) && Array.isArray(updates)) {
     originObj[key] = updates;
@@ -43,11 +45,11 @@ function getDefaultState(): VbenFormProps {
 }
 
 export class FormApi {
+  private prevState: null | VbenFormProps = null;
   // private api: Pick<VbenFormProps, 'handleReset' | 'handleSubmit'>;
   public form = {} as FormActions;
-  isMounted = false;
 
-  // private prevState!: ModalState;
+  isMounted = false;
   public state: null | VbenFormProps = null;
 
   stateHandler: StateHandler;
@@ -66,7 +68,9 @@ export class FormApi {
       },
       {
         onUpdate: () => {
+          this.prevState = this.state;
           this.state = this.store.state;
+          this.updateState();
         },
       },
     );
@@ -85,6 +89,24 @@ export class FormApi {
       throw new Error('<VbenForm /> is not mounted');
     }
     return this.form;
+  }
+
+  private updateState() {
+    const currentSchema = this.state?.schema ?? [];
+    const prevSchema = this.prevState?.schema ?? [];
+    // 进行了删除schema操作
+    if (currentSchema.length < prevSchema.length) {
+      const currentFields = new Set(
+        currentSchema.map((item) => item.fieldName),
+      );
+      const deletedSchema = prevSchema.filter(
+        (item) => !currentFields.has(item.fieldName),
+      );
+
+      for (const schema of deletedSchema) {
+        this.form?.setFieldValue(schema.fieldName, undefined);
+      }
+    }
   }
 
   // 如果需要多次更新状态，可以使用 batch 方法
@@ -162,12 +184,25 @@ export class FormApi {
     }
   }
 
+  /**
+   * 设置表单值
+   * @param fields record
+   * @param filterFields 过滤不在schema中定义的字段 默认为true
+   * @param shouldValidate
+   */
   async setValues(
     fields: Record<string, any>,
+    filterFields: boolean = true,
     shouldValidate: boolean = false,
   ) {
     const form = await this.getForm();
-    form.setValues(fields, shouldValidate);
+    if (!filterFields) {
+      form.setValues(fields, shouldValidate);
+      return;
+    }
+    const fieldNames = this.state?.schema?.map((item) => item.fieldName) ?? [];
+    const filteredFields = objectPick(fields, fieldNames);
+    form.setValues(filteredFields, shouldValidate);
   }
 
   async submitForm(e?: Event) {
