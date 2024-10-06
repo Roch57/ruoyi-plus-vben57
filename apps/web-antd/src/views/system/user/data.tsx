@@ -1,7 +1,7 @@
 import { DictEnum } from '@vben/constants';
 import { getPopupContainer } from '@vben/utils';
 
-import { type FormSchemaGetter, z } from '#/adapter';
+import { type FormSchemaGetter, type VxeGridProps, z } from '#/adapter';
 import { getDictOptions } from '#/utils/dict';
 
 export const querySchema: FormSchemaGetter = () => [
@@ -39,6 +39,52 @@ export const querySchema: FormSchemaGetter = () => [
     label: '创建时间',
   },
 ];
+
+export const columns: VxeGridProps['columns'] = [
+  { type: 'checkbox', width: 60 },
+  {
+    field: 'userName',
+    title: '名称',
+  },
+  {
+    field: 'nickName',
+    title: '昵称',
+  },
+  {
+    field: 'avatar',
+    title: '头像',
+    slots: { default: 'avatar' },
+    width: 80,
+  },
+  {
+    field: 'deptName',
+    title: '部门',
+  },
+  {
+    field: 'phonenumber',
+    title: '手机号',
+    formatter({ cellValue }) {
+      return cellValue || '暂无';
+    },
+  },
+  {
+    field: 'status',
+    title: '状态',
+    slots: { default: 'status' },
+  },
+  {
+    field: 'createTime',
+    title: '创建时间',
+  },
+  {
+    field: 'action',
+    fixed: 'right',
+    slots: { default: 'action' },
+    title: '操作',
+    width: 180,
+  },
+];
+
 export const drawerSchema: FormSchemaGetter = () => [
   {
     component: 'Input',
@@ -76,18 +122,27 @@ export const drawerSchema: FormSchemaGetter = () => [
   },
   {
     component: 'Input',
-    fieldName: 'phone',
+    fieldName: 'phonenumber',
     label: '手机号码',
+    defaultValue: undefined,
     rules: z
       .string()
       .regex(/^1[3-9]\d{9}$/, '请输入正确的手机号码')
-      .optional(),
+      .optional()
+      .or(z.literal('')),
   },
   {
     component: 'Input',
     fieldName: 'email',
+    defaultValue: undefined,
     label: '邮箱',
-    rules: z.string().email('请输入正确的邮箱').optional(),
+    /**
+     * z.literal 是 Zod 中的一种类型，用于定义一个特定的字面量值。
+     * 它可以用于确保输入的值与指定的字面量完全匹配。
+     * 例如，你可以使用 z.literal 来确保某个字段的值只能是特定的字符串、数字、布尔值等。
+     * 即空字符串也可通过校验
+     */
+    rules: z.string().email('请输入正确的邮箱').optional().or(z.literal('')),
   },
   {
     component: 'RadioGroup',

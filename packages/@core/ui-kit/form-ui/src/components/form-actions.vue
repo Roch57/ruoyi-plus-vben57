@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, toRaw, unref } from 'vue';
+import { computed, toRaw, unref, watch } from 'vue';
 
 import { useSimpleLocale } from '@vben-core/composables';
 import { VbenExpandableArrow } from '@vben-core/shadcn-ui';
-import { cn, isFunction } from '@vben-core/shared/utils';
+import { cn, isFunction, triggerWindowResize } from '@vben-core/shared/utils';
 
 import { COMPONENT_MAP } from '../config';
 import { injectFormProps } from '../use-form-context';
@@ -30,12 +30,12 @@ const submitButtonOptions = computed(() => {
   };
 });
 
-const isQueryForm = computed(() => {
-  return !!unref(rootProps).showCollapseButton;
-});
+// const isQueryForm = computed(() => {
+//   return !!unref(rootProps).showCollapseButton;
+// });
 
 const queryFormStyle = computed(() => {
-  if (isQueryForm.value) {
+  if (!unref(rootProps).actionWrapperClass) {
     return {
       'grid-column': `-2 / -1`,
       marginLeft: 'auto',
@@ -65,6 +65,16 @@ async function handleReset(e: Event) {
     form.resetForm();
   }
 }
+
+watch(
+  () => collapsed.value,
+  () => {
+    const props = unref(rootProps);
+    if (props.collapseTriggerResize) {
+      triggerWindowResize();
+    }
+  },
+);
 </script>
 <template>
   <div

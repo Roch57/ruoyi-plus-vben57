@@ -3,21 +3,54 @@ import type { GenInfo } from '#/api/tool/gen/model';
 
 import { inject, type Ref, unref } from 'vue';
 
-import { Space, Table } from 'ant-design-vue';
+import { message, Space } from 'ant-design-vue';
 import { cloneDeep } from 'lodash-es';
 
+import { useVbenVxeGrid, type VxeGridProps } from '#/adapter';
 import { editSave } from '#/api/tool/gen';
 
 import { toCurrentStep } from '../mitt';
+import { validRules, vxeTableColumns } from './gen-data';
 
 /**
  * 从父组件注入
  */
 const genInfoData = inject('genInfoData') as Ref<GenInfo['info']>;
 
+const gridOptions: VxeGridProps = {
+  columns: vxeTableColumns,
+  keepSource: true,
+  editConfig: { trigger: 'click', mode: 'cell', showStatus: true },
+  editRules: validRules,
+  rowConfig: {
+    isHover: true,
+    keyField: 'id',
+    isCurrent: true, // 高亮当前行
+  },
+  columnConfig: {
+    resizable: true,
+  },
+  proxyConfig: {
+    enabled: true,
+  },
+  data: genInfoData.value.columns,
+  round: true,
+  align: 'center',
+  showOverflow: true,
+};
+
+const [BasicTable, tableApi] = useVbenVxeGrid({ gridOptions });
+
 async function handleSubmit() {
   try {
+    const hasError = await tableApi.grid.validate();
+    if (hasError) {
+      message.error('校验未通过');
+      return;
+    }
     const requestData = cloneDeep(unref(genInfoData));
+    // 从表格获取最新的
+    requestData.columns = tableApi.grid.getData();
     // 树表需要添加这个参数
     if (requestData && requestData.tplCategory === 'tree') {
       const { treeCode, treeName, treeParentCode } = requestData;
@@ -56,7 +89,7 @@ async function handleSubmit() {
 
 <template>
   <div class="flex flex-col gap-[16px] p-[12px]">
-    <Table />
+    <BasicTable />
     <div class="flex justify-center">
       <Space>
         <a-button @click="toCurrentStep(0)">上一步</a-button>

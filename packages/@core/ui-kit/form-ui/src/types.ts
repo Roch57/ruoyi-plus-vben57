@@ -154,6 +154,10 @@ export interface FormCommonConfig {
    */
   disabledOnChangeListener?: boolean;
   /**
+   * 所有表单项的空状态值,默认都是undefined，naive-ui的空状态值是null
+   */
+  emptyStateValue?: null | undefined;
+  /**
    * 所有表单项的控件样式
    * @default {}
    */
@@ -245,6 +249,11 @@ export interface FormRenderProps<
    */
   collapsedRows?: number;
   /**
+   * 是否触发resize事件
+   * @default false
+   */
+  collapseTriggerResize?: boolean;
+  /**
    * 表单项通用后备配置，当子项目没配置时使用这里的配置，子项目配置优先级高于此配置
    */
   commonConfig?: FormCommonConfig;
@@ -303,6 +312,10 @@ export interface VbenFormProps<
    */
   handleSubmit?: HandleSubmitFn;
   /**
+   * 表单值变化回调
+   */
+  handleValuesChange?: (values: Record<string, any>) => void;
+  /**
    * 重置按钮参数
    */
   resetButtonOptions?: ActionButtonOptions;
@@ -332,6 +345,7 @@ export interface VbenFormAdapterOptions<
   config?: {
     baseModelPropName?: string;
     disabledOnChangeListener?: boolean;
+    emptyStateValue?: null | undefined;
     modelPropNameMap?: Partial<Record<T, string>>;
   };
   defineRules?: {
