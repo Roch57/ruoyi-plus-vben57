@@ -22,7 +22,13 @@
     }
   },
   "dependencies": {
+<<<<<<< HEAD
+    "@vben/prettier-config": "file:",
+    "prettier": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.6.6"
+=======
     "prettier": "catalog:",
     "prettier-plugin-tailwindcss": "catalog:"
+>>>>>>> 29d24b49e366cdb89595be4ba21036882ee360e4
   }
 }
