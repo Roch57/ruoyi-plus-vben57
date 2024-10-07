@@ -10,6 +10,7 @@ import {
   type VbenFormProps,
 } from '@vben/common-ui';
 import { $t } from '@vben/locales';
+import { preferences } from '@vben/preferences';
 import { getPopupContainer } from '@vben/utils';
 
 import {
@@ -63,7 +64,9 @@ const formOptions: VbenFormProps = {
   handleReset: async () => {
     selectDeptId.value = [];
     // eslint-disable-next-line no-use-before-define
-    await tableApi.query();
+    const { formApi, reload } = tableApi;
+    await formApi.resetForm();
+    await reload();
   },
 };
 
@@ -122,7 +125,6 @@ const gridOptions: VxeGridProps = {
   align: 'center',
   showOverflow: true,
 };
-
 const checked = ref(false);
 const [BasicTable, tableApi] = useVbenVxeGrid({
   formOptions,
@@ -194,7 +196,7 @@ function handleResetPwd(record: Recordable<any>) {
     <div class="flex h-full gap-[8px]">
       <DeptTree
         v-model:select-dept-id="selectDeptId"
-        :height="300"
+        :height="360"
         class="w-[260px]"
         @select="() => tableApi.query()"
       />
@@ -236,10 +238,7 @@ function handleResetPwd(record: Recordable<any>) {
         </template>
         <template #avatar="{ row }">
           <Avatar v-if="row.avatar" :src="row.avatar" />
-          <Avatar
-            v-else
-            src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
-          />
+          <Avatar v-else :src="preferences.app.defaultAvatar" />
         </template>
         <template #status="{ row }">
           <TableSwitch
@@ -251,29 +250,28 @@ function handleResetPwd(record: Recordable<any>) {
         </template>
         <template #action="{ row }">
           <template v-if="row.userId !== 1">
-            <a-button
-              size="small"
-              type="link"
-              v-access:code="['system:user:edit']"
-              @click.stop="handleEdit(row)"
-            >
-              {{ $t('pages.common.edit') }}
-            </a-button>
-            <Popconfirm
-              placement="left"
-              title="确认删除？"
-              @confirm="handleDelete(row)"
-            >
-              <a-button
-                danger
-                size="small"
-                type="link"
-                v-access:code="['system:user:remove']"
-                @click.stop=""
+            <Space>
+              <ghost-button
+                v-access:code="['system:user:edit']"
+                @click.stop="handleEdit(row)"
               >
-                {{ $t('pages.common.delete') }}
-              </a-button>
-            </Popconfirm>
+                {{ $t('pages.common.edit') }}
+              </ghost-button>
+              <Popconfirm
+                :get-popup-container="getPopupContainer"
+                placement="left"
+                title="确认删除？"
+                @confirm="handleDelete(row)"
+              >
+                <ghost-button
+                  danger
+                  v-access:code="['system:user:remove']"
+                  @click.stop=""
+                >
+                  {{ $t('pages.common.delete') }}
+                </ghost-button>
+              </Popconfirm>
+            </Space>
             <Dropdown
               :get-popup-container="getPopupContainer"
               placement="bottomRight"
