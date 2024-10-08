@@ -223,8 +223,8 @@ export const drawerSchema: FormSchemaGetter = () => [
           .regex(/^https?:\/\//, { message: '请输入正确的链接地址' });
       },
       // 类型不为按钮时显示
-      show: (values) => values.menuType !== 'F',
-      triggerFields: ['isFrame'],
+      show: (values) => values?.menuType !== 'F',
+      triggerFields: ['isFrame', 'menuType'],
     },
     fieldName: 'path',
     help: `路由地址不带/, 如: menu, user 链接为http(s)://开头 链接默认使用内部iframe打开, 可通过{是否外链}控制打开方式`,
@@ -325,9 +325,11 @@ export const drawerSchema: FormSchemaGetter = () => [
   },
   {
     component: 'Input',
-    componentProps: (model) => ({
+    componentProps: () => ({
       // 为链接时组件disabled
-      disabled: model.isFrame === '0',
+      // disabled: model.isFrame === '0',
+      placeholder: '暂未实现功能',
+      disabled: true,
     }),
     dependencies: {
       // 类型为菜单时显示

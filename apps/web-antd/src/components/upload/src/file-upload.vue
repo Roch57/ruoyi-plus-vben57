@@ -6,8 +6,8 @@ import { ref, toRefs, watch } from 'vue';
 
 import { $t } from '@vben/locales';
 
-import { PlusOutlined } from '@ant-design/icons-vue';
-import { message, Modal, Upload } from 'ant-design-vue';
+import { UploadOutlined } from '@ant-design/icons-vue';
+import { message, Upload } from 'ant-design-vue';
 import { isArray, isFunction, isObject, isString } from 'lodash-es';
 
 import { uploadApi } from '#/api';
@@ -16,7 +16,7 @@ import { checkFileType } from './helper';
 import { UploadResultStatus } from './typing';
 import { useUploadType } from './use-upload';
 
-defineOptions({ name: 'ImageUpload' });
+defineOptions({ name: 'FileUpload' });
 
 const props = withDefaults(
   defineProps<{
@@ -29,8 +29,6 @@ const props = withDefaults(
     api?: (...args: any[]) => Promise<any>;
     disabled?: boolean;
     helpText?: string;
-    // eslint-disable-next-line no-use-before-define
-    listType?: ListType;
     // 最大数量的文件，Infinity不限制
     maxNumber?: number;
     // 文件最大多少MB
@@ -45,7 +43,6 @@ const props = withDefaults(
   {
     value: () => [],
     disabled: false,
-    listType: 'picture-card',
     helpText: '',
     maxSize: 2,
     maxNumber: 1,
@@ -56,7 +53,6 @@ const props = withDefaults(
   },
 );
 const emit = defineEmits(['change', 'update:value', 'delete']);
-type ListType = 'picture' | 'picture-card' | 'text';
 const { accept, helpText, maxNumber, maxSize } = toRefs(props);
 const isInnerOperate = ref<boolean>(false);
 const { getStringAccept } = useUploadType({
@@ -65,9 +61,6 @@ const { getStringAccept } = useUploadType({
   maxNumberRef: maxNumber,
   maxSizeRef: maxSize,
 });
-const previewOpen = ref<boolean>(false);
-const previewImage = ref<string>('');
-const previewTitle = ref<string>('');
 
 const fileList = ref<UploadProps['fileList']>([]);
 const isLtMsg = ref<boolean>(true);
@@ -114,30 +107,6 @@ watch(
   },
 );
 
-function getBase64<T extends ArrayBuffer | null | string>(file: File) {
-  return new Promise<T>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.addEventListener('load', () => {
-      resolve(reader.result as T);
-    });
-    reader.addEventListener('error', (error) => reject(error));
-  });
-}
-
-const handlePreview = async (file: UploadFile) => {
-  if (!file.url && !file.preview) {
-    file.preview = await getBase64<string>(file.originFileObj!);
-  }
-  previewImage.value = file.url || file.preview || '';
-  previewOpen.value = true;
-  previewTitle.value =
-    file.name ||
-    previewImage.value.slice(
-      Math.max(0, previewImage.value.lastIndexOf('/') + 1),
-    );
-};
-
 const handleRemove = async (file: UploadFile) => {
   if (fileList.value) {
     const index = fileList.value.findIndex((item) => item.uid === file.uid);
@@ -148,11 +117,6 @@ const handleRemove = async (file: UploadFile) => {
     emit('change', value);
     emit('delete', file);
   }
-};
-
-const handleCancel = () => {
-  previewOpen.value = false;
-  previewTitle.value = '';
 };
 
 const beforeUpload = (file: File) => {
@@ -221,25 +185,18 @@ function getValue() {
       :before-upload="beforeUpload"
       :custom-request="customRequest"
       :disabled="disabled"
-      :list-type="listType"
       :max-count="maxNumber"
       :multiple="multiple"
-      @preview="handlePreview"
+      list-type="text"
       @remove="handleRemove"
     >
       <div v-if="fileList && fileList.length < maxNumber">
-        <PlusOutlined />
-        <div style="margin-top: 8px">{{ $t('component.upload.upload') }}</div>
+        <a-button>
+          <UploadOutlined />
+          {{ $t('component.upload.upload') }}
+        </a-button>
       </div>
     </Upload>
-    <Modal
-      :footer="null"
-      :open="previewOpen"
-      :title="previewTitle"
-      @cancel="handleCancel"
-    >
-      <img :src="previewImage" alt="" style="width: 100%" />
-    </Modal>
   </div>
 </template>
 
