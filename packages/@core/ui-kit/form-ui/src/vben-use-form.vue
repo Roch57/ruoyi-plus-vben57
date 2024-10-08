@@ -51,6 +51,7 @@ const handleUpdateCollapsed = (value: boolean) => {
 <template>
   <Form
     v-bind="forward"
+    :collapsed="state.collapsed"
     :component-bind-event-map="COMPONENT_BIND_EVENT_MAP"
     :component-map="COMPONENT_MAP"
     :form="form"

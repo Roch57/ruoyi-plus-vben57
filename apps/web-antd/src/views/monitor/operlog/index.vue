@@ -151,7 +151,13 @@ async function handleDelete() {
           </a-button>
           <a-button
             v-access:code="['monitor:operlog:export']"
-            @click="downloadExcel(operLogExport, '操作日志', {})"
+            @click="
+              downloadExcel(
+                operLogExport,
+                '操作日志',
+                tableApi.formApi.form.values,
+              )
+            "
           >
             {{ $t('pages.common.export') }}
           </a-button>
@@ -167,14 +173,12 @@ async function handleDelete() {
         </Space>
       </template>
       <template #action="{ row }">
-        <a-button
-          size="small"
-          type="link"
+        <ghost-button
           v-access:code="['monitor:operlog:list']"
           @click.stop="handlePreview(row)"
         >
           {{ $t('pages.common.preview') }}
-        </a-button>
+        </ghost-button>
       </template>
     </BasicTable>
     <OperationPreviewDrawer />

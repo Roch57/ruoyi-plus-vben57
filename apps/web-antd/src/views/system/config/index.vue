@@ -4,6 +4,7 @@ import type { Recordable } from '@vben/types';
 import { ref } from 'vue';
 
 import { Page, useVbenModal, type VbenFormProps } from '@vben/common-ui';
+import { getPopupContainer } from '@vben/utils';
 
 import { Modal, Popconfirm, Space } from 'ant-design-vue';
 import dayjs from 'dayjs';
@@ -138,7 +139,13 @@ async function handleRefreshCache() {
           <a-button @click="handleRefreshCache"> 刷新缓存 </a-button>
           <a-button
             v-access:code="['system:config:export']"
-            @click="downloadExcel(configExport, '参数配置', {})"
+            @click="
+              downloadExcel(
+                configExport,
+                '参数配置',
+                tableApi.formApi.form.values,
+              )
+            "
           >
             {{ $t('pages.common.export') }}
           </a-button>
@@ -161,29 +168,28 @@ async function handleRefreshCache() {
         </Space>
       </template>
       <template #action="{ row }">
-        <a-button
-          size="small"
-          type="link"
-          v-access:code="['system:config:edit']"
-          @click="handleEdit(row)"
-        >
-          {{ $t('pages.common.edit') }}
-        </a-button>
-        <Popconfirm
-          placement="left"
-          title="确认删除？"
-          @confirm="handleDelete(row)"
-        >
-          <a-button
-            danger
-            size="small"
-            type="link"
-            v-access:code="['system:config:remove']"
-            @click.stop=""
+        <Space>
+          <ghost-button
+            v-access:code="['system:config:edit']"
+            @click.stop="handleEdit(row)"
           >
-            {{ $t('pages.common.delete') }}
-          </a-button>
-        </Popconfirm>
+            {{ $t('pages.common.edit') }}
+          </ghost-button>
+          <Popconfirm
+            :get-popup-container="getPopupContainer"
+            placement="left"
+            title="确认删除？"
+            @confirm="handleDelete(row)"
+          >
+            <ghost-button
+              danger
+              v-access:code="['system:config:remove']"
+              @click.stop=""
+            >
+              {{ $t('pages.common.delete') }}
+            </ghost-button>
+          </Popconfirm>
+        </Space>
       </template>
     </BasicTable>
     <ConfigModal @reload="tableApi.query()" />

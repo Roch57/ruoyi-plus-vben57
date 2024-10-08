@@ -6,7 +6,12 @@ import { computed } from 'vue';
 import { useAccess } from '@vben/access';
 import { Page, useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
 import { Fallback } from '@vben/common-ui';
-import { eachTree, listToTree, removeEmptyChildren } from '@vben/utils';
+import {
+  eachTree,
+  getPopupContainer,
+  listToTree,
+  removeEmptyChildren,
+} from '@vben/utils';
 
 import { Popconfirm, Space, Tooltip } from 'ant-design-vue';
 
@@ -95,6 +100,12 @@ function handleAdd() {
   drawerApi.open();
 }
 
+function handleSubAdd(row: Recordable<any>) {
+  const { menuId } = row;
+  drawerApi.setData({ id: menuId, update: false });
+  drawerApi.open();
+}
+
 async function handleEdit(record: Recordable<any>) {
   drawerApi.setData({ id: record.menuId });
   drawerApi.open();
@@ -153,32 +164,52 @@ const isAdmin = computed(() => {
         </Space>
       </template>
       <template #action="{ row }">
-        <a-button
-          size="small"
-          type="link"
-          v-access:code="['system:menu:edit']"
-          @click="handleEdit(row)"
-        >
-          {{ $t('pages.common.edit') }}
-        </a-button>
-        <Popconfirm
-          placement="left"
-          title="确认删除？"
-          @confirm="handleDelete(row)"
-        >
-          <a-button
-            danger
-            size="small"
-            type="link"
-            v-access:code="['system:menu:remove']"
-            @click.stop=""
+        <Space>
+          <ghost-button
+            v-access:code="['system:menu:edit']"
+            @click="handleEdit(row)"
           >
-            {{ $t('pages.common.delete') }}
-          </a-button>
-        </Popconfirm>
+            {{ $t('pages.common.edit') }}
+          </ghost-button>
+          <!-- '按钮类型'无法再添加子菜单 -->
+          <ghost-button
+            v-if="row.menuType !== 'F'"
+            class="btn-add"
+            v-access:code="['system:menu:add']"
+            @click="handleSubAdd(row)"
+          >
+            {{ $t('pages.common.add') }}
+          </ghost-button>
+          <Popconfirm
+            :get-popup-container="getPopupContainer"
+            placement="left"
+            title="确认删除？"
+            @confirm="handleDelete(row)"
+          >
+            <ghost-button
+              danger
+              v-access:code="['system:menu:remove']"
+              @click.stop=""
+            >
+              {{ $t('pages.common.delete') }}
+            </ghost-button>
+          </Popconfirm>
+        </Space>
       </template>
     </BasicTable>
     <MenuDrawer @reload="tableApi.query()" />
   </Page>
   <Fallback v-else description="您没有菜单管理的访问权限" status="403" />
 </template>
+
+<style lang="scss" scoped>
+.btn-add {
+  color: hsl(var(--success)) !important;
+  border-color: hsl(var(--success)) !important;
+
+  &:hover {
+    color: hsl(var(--success) / 50%) !important;
+    border-color: hsl(var(--success) / 50%) !important;
+  }
+}
+</style>

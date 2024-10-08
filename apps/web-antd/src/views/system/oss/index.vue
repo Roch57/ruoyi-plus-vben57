@@ -4,8 +4,9 @@ import type { Recordable } from '@vben/types';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { Page, type VbenFormProps } from '@vben/common-ui';
+import { Page, useVbenModal, type VbenFormProps } from '@vben/common-ui';
 import { $t } from '@vben/locales';
+import { getPopupContainer } from '@vben/utils';
 
 import {
   Image,
@@ -25,6 +26,7 @@ import { ossDownload, ossList, ossRemove } from '#/api/system/oss';
 import { downloadByData } from '#/utils/file/download';
 
 import { columns, querySchema } from './data';
+import imageUploadModal from './image-upload-modal.vue';
 
 const formOptions: VbenFormProps = {
   commonConfig: {
@@ -152,6 +154,9 @@ function isImageFile(ext: string) {
   const supportList = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
   return supportList.some((item) => ext.toLocaleLowerCase().includes(item));
 }
+const [ImageUploadModal, imageUploadApi] = useVbenModal({
+  connectedComponent: imageUploadModal,
+});
 </script>
 
 <template>
@@ -180,7 +185,12 @@ function isImageFile(ext: string) {
           >
             {{ $t('pages.common.delete') }}
           </a-button>
-          <a-button> 上传 没做 </a-button>
+          <a-button
+            v-access:code="['system:oss:upload']"
+            @click="imageUploadApi.open"
+          >
+            图片上传
+          </a-button>
         </Space>
       </template>
       <template #url="{ row }">
@@ -192,30 +202,30 @@ function isImageFile(ext: string) {
         <span v-else>{{ row.url }}</span>
       </template>
       <template #action="{ row }">
-        <a-button
-          size="small"
-          type="link"
-          v-access:code="['system:oss:edit']"
-          @click="handleDownload(row)"
-        >
-          {{ $t('pages.common.download') }}
-        </a-button>
-        <Popconfirm
-          placement="left"
-          title="确认删除？"
-          @confirm="handleDelete(row)"
-        >
-          <a-button
-            danger
-            size="small"
-            type="link"
-            v-access:code="['system:oss:remove']"
-            @click.stop=""
+        <Space>
+          <ghost-button
+            v-access:code="['system:oss:download']"
+            @click="handleDownload(row)"
           >
-            {{ $t('pages.common.delete') }}
-          </a-button>
-        </Popconfirm>
+            {{ $t('pages.common.download') }}
+          </ghost-button>
+          <Popconfirm
+            :get-popup-container="getPopupContainer"
+            placement="left"
+            title="确认删除？"
+            @confirm="handleDelete(row)"
+          >
+            <ghost-button
+              danger
+              v-access:code="['system:oss:remove']"
+              @click.stop=""
+            >
+              {{ $t('pages.common.delete') }}
+            </ghost-button>
+          </Popconfirm>
+        </Space>
       </template>
     </BasicTable>
+    <ImageUploadModal @reload="tableApi.query" />
   </Page>
 </template>
