@@ -12,6 +12,8 @@ v5版本采用分仓(包)目录结构, 具体开发路径为: `根目录/apps/we
 
 基础功能已经开发完毕
 
+👉 [更新日志](https://gitee.com/dapppp/ruoyi-plus-vben5/blob/main/CHANGELOG.md)
+
 ## 简介
 
 基于 [vben5 & ant-design-vue](https://github.com/vbenjs/vue-vben-admin) 的 RuoYi-Vue-Plus 前端项目
@@ -40,7 +42,7 @@ admin 账号: admin admin123
 
 ## 文档
 
-[vben 文档地址](https://doc.vvbin.cn/)
+[Vben V5 文档地址](https://doc.vben.pro/)
 
 [RuoYi-Plus 文档地址](https://plus-doc.dromara.org/#/)
 
@@ -73,6 +75,10 @@ cd ruoyi-plus-vben5
 
 pnpm install
 ```
+
+- 菜单图标替换
+
+[根目录/scripts/菜单图标替换sql/update_icon.sql](https://gitee.com/dapppp/ruoyi-plus-vben5/blob/main/scripts/%E8%8F%9C%E5%8D%95%E5%9B%BE%E6%A0%87%E6%9B%BF%E6%8D%A2sql/update_icon.sql)
 
 - 关于代码生成
 
