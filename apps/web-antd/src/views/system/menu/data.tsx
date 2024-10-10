@@ -180,8 +180,15 @@ export const drawerSchema: FormSchemaGetter = () => [
       show: (values) => values.menuType !== 'F',
       triggerFields: ['menuType'],
     },
+    renderComponentContent: () => ({
+      addonAfter: () => (
+        <a href="https://icon-sets.iconify.design/" target="_blank">
+          搜索图标
+        </a>
+      ),
+    }),
     fieldName: 'icon',
-    help: '选择或者从 https://icon-sets.iconify.design/ 查找名称粘贴',
+    help: '点击搜索图标跳转到iconify & 粘贴',
     label: '菜单图标',
   },
   {
@@ -325,11 +332,10 @@ export const drawerSchema: FormSchemaGetter = () => [
   },
   {
     component: 'Input',
-    componentProps: () => ({
+    componentProps: (model) => ({
       // 为链接时组件disabled
-      // disabled: model.isFrame === '0',
-      placeholder: '暂未实现功能',
-      disabled: true,
+      disabled: model.isFrame === '0',
+      placeholder: '必须为json字符串格式',
     }),
     dependencies: {
       // 类型为菜单时显示
