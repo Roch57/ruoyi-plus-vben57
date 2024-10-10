@@ -26,7 +26,6 @@ const [BasicForm, formApi] = useVbenForm({
     },
     formItemClass: 'col-span-2',
   },
-  layout: 'vertical',
   schema: drawerSchema(),
   showDefaultActions: false,
   wrapperClass: 'grid-cols-2',
