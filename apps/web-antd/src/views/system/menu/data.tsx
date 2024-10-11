@@ -1,4 +1,5 @@
 import { DictEnum } from '@vben/constants';
+import { $t } from '@vben/locales';
 import { getPopupContainer } from '@vben/utils';
 
 import { type FormSchemaGetter, type VxeGridProps, z } from '#/adapter';
@@ -56,6 +57,10 @@ export const columns: VxeGridProps['columns'] = [
     field: 'menuName',
     treeNode: true,
     width: 200,
+    slots: {
+      // 需要i18n支持 否则返回原始值
+      default: ({ row }) => $t(row.menuName),
+    },
   },
   {
     title: '图标',
@@ -195,6 +200,7 @@ export const drawerSchema: FormSchemaGetter = () => [
     component: 'Input',
     fieldName: 'menuName',
     label: '菜单名称',
+    help: '支持i18n写法, 如: menu.system.user',
     rules: 'required',
   },
   {
