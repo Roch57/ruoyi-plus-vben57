@@ -12,8 +12,6 @@ import { tenantList, type TenantResp } from '#/api';
 import { captchaImage, type CaptchaResponse } from '#/api/core/captcha';
 import { useAuthStore } from '#/store';
 
-import OAuthLogin from './oauth-login.vue';
-
 defineOptions({ name: 'Login' });
 
 const authStore = useAuthStore();
@@ -152,11 +150,10 @@ async function handleAccountLogin(values: LoginForm) {
     ref="loginFormRef"
     :form-schema="formSchema"
     :loading="authStore.loginLoading"
+    :show-code-login="false"
+    :show-qrcode-login="false"
     :show-register="false"
+    :show-third-party-login="false"
     @submit="handleAccountLogin"
-  >
-    <template #third-party-login>
-      <OAuthLogin />
-    </template>
-  </AuthenticationLogin>
+  />
 </template>
