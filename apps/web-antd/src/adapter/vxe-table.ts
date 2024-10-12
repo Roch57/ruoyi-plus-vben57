@@ -27,7 +27,7 @@ setupVbenVxeTable({
         showOverflow: true,
         pagerConfig: {
           // 默认条数
-          pageSize: 10,
+          pageSize: 20,
           // 分页可选条数
           pageSizes: [10, 20, 30, 40, 50],
         },
@@ -53,7 +53,7 @@ setupVbenVxeTable({
         // 圆角按钮
         round: true,
         // 表格尺寸
-        size: 'medium',
+        size: 'mini',
         customConfig: {
           // 表格右上角自定义列配置 是否保存到localStorage
           // 必须存在id参数才能使用

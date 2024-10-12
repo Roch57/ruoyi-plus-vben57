@@ -39,5 +39,6 @@ export const overridesPreferences = defineOverridesPreferences({
      * 浅色sidebar
      */
     semiDarkSidebar: false,
+    radius: '0.25',
   },
 });
