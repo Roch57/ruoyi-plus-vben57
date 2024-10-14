@@ -58,7 +58,7 @@ const formSchema = computed((): VbenFormSchema[] => {
       component: 'VbenSelect',
       componentProps: {
         class: 'bg-background h-[40px] focus:border-primary',
-        contentClass: 'h-[256px] overflow-y-auto',
+        contentClass: 'max-h-[256px] overflow-y-auto',
         options: tenantInfo.value.voList?.map((item) => ({
           label: item.companyName,
           value: item.tenantId,
@@ -68,7 +68,15 @@ const formSchema = computed((): VbenFormSchema[] => {
       defaultValue: '000000',
       dependencies: {
         if: () => tenantInfo.value.tenantEnabled,
-        triggerFields: [''],
+        // 这里大致上是watch的一个效果
+        componentProps: (model) => {
+          localStorage.setItem(
+            '__oauth_tenant_id',
+            model?.tenantId ?? '000000',
+          );
+          return {};
+        },
+        triggerFields: ['', 'tenantId'],
       },
       fieldName: 'tenantId',
       label: $t('authentication.selectAccount'),
