@@ -47,4 +47,7 @@ export const overridesPreferences = defineOverridesPreferences({
     semiDarkSidebar: false,
     radius: '0.25',
   },
+  breadcrumb: {
+    styleType: 'background',
+  },
 });
