@@ -75,6 +75,8 @@ const [Form, formApi] = useTableForm({
   showCollapseButton: true,
   submitButtonOptions: {
     content: $t('common.query'),
+    // antd 按钮原生类型 需要设置为submit才能在输入框回车提交
+    htmlType: 'submit',
   },
   wrapperClass: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
 });
@@ -274,6 +276,18 @@ onMounted(() => {
                   :name="`${FORM_SLOT_PREFIX}${slotName}`"
                   v-bind="slotProps"
                 ></slot>
+              </template>
+              <template #reset-before="slotProps">
+                <slot name="reset-before" v-bind="slotProps"></slot>
+              </template>
+              <template #submit-before="slotProps">
+                <slot name="submit-before" v-bind="slotProps"></slot>
+              </template>
+              <template #expand-before="slotProps">
+                <slot name="expand-before" v-bind="slotProps"></slot>
+              </template>
+              <template #expand-after="slotProps">
+                <slot name="expand-after" v-bind="slotProps"></slot>
               </template>
             </Form>
           </slot>

@@ -7,6 +7,7 @@
 - 支持菜单名称i18n
 - 登录页 验证码登录
 - Markdown编辑/预览组件(基于vditor)
+- VxeTable搜索表单 enter提交
 
 **BUG FIXES**
 
@@ -14,6 +15,8 @@
 - 字典管理 关闭租户不应显示`同步租户字典`按钮
 - 登录日志 漏掉了登录日志日期查询
 - 登出相关逻辑在并发(非await)情况下重复执行的问题
+- VxeTable在开启/关闭查询表单时 需要使用不同的padding
+- VxeTable表格刷新 默认为reload 修改为在当前页刷新(query)
 
 **OTHERS**
 
