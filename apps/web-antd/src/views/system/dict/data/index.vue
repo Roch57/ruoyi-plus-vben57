@@ -3,13 +3,17 @@ import type { Recordable } from '@vben/types';
 
 import { ref } from 'vue';
 
-import { Page, useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
+import { useVbenDrawer, type VbenFormProps } from '@vben/common-ui';
 import { getPopupContainer } from '@vben/utils';
 
 import { Modal, Popconfirm, Space } from 'ant-design-vue';
 import dayjs from 'dayjs';
 
-import { useVbenVxeGrid, type VxeGridProps } from '#/adapter/vxe-table';
+import {
+  tableCheckboxEvent,
+  useVbenVxeGrid,
+  type VxeGridProps,
+} from '#/adapter/vxe-table';
 import {
   dictDataExport,
   dictDataList,
@@ -87,12 +91,8 @@ const [BasicTable, tableApi] = useVbenVxeGrid({
   formOptions,
   gridOptions,
   gridEvents: {
-    checkboxChange: (e: any) => {
-      checked.value = e.records.length > 0;
-    },
-    checkboxAll: (e: any) => {
-      checked.value = e.records.length > 0;
-    },
+    checkboxChange: tableCheckboxEvent(checked),
+    checkboxAll: tableCheckboxEvent(checked),
   },
 });
 
@@ -140,7 +140,7 @@ emitter.on('rowClick', async (value) => {
 </script>
 
 <template>
-  <Page :auto-content-height="true">
+  <div>
     <BasicTable>
       <template #toolbar-actions>
         <span class="pl-[7px] text-[16px]">字典数据列表</span>
@@ -204,5 +204,5 @@ emitter.on('rowClick', async (value) => {
       </template>
     </BasicTable>
     <DictDataDrawer @reload="tableApi.query()" />
-  </Page>
+  </div>
 </template>
