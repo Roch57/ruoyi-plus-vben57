@@ -27,6 +27,7 @@ const [BasicForm, formApi] = useVbenForm({
 
 const [BasicModal, modalApi] = useVbenModal({
   fullscreenButton: false,
+  draggable: true,
   onCancel: handleCancel,
   onConfirm: handleConfirm,
   onOpenChange: async (isOpen) => {
