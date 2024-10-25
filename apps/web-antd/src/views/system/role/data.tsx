@@ -131,12 +131,22 @@ export const drawerSchema: FormSchemaGetter = () => [
     componentProps: {
       allowClear: false,
       options: getDictOptions(DictEnum.SYS_NORMAL_DISABLE),
+      getPopupContainer,
     },
     defaultValue: '0',
     fieldName: 'status',
     help: '修改后, 拥有该角色的用户将自动下线.',
     label: '角色状态',
     rules: 'required',
+  },
+  {
+    component: 'Radio',
+    dependencies: {
+      show: () => false,
+      triggerFields: [''],
+    },
+    fieldName: 'menuCheckStrictly',
+    label: '菜单权限',
   },
   {
     component: 'Input',
