@@ -3,10 +3,15 @@ import { computed, ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
 import { $t } from '@vben/locales';
-import { cloneDeep } from '@vben/utils';
+import { cloneDeep, getPopupContainer, listToTree } from '@vben/utils';
 
 import { useVbenForm } from '#/adapter/form';
-import { noticeAdd, noticeInfo, noticeUpdate } from '#/api/system/notice';
+import {
+  categoryAdd,
+  categoryInfo,
+  categoryList,
+  categoryUpdate,
+} from '#/api/workflow/category';
 
 import { modalSchema } from './data';
 
@@ -18,15 +23,47 @@ const title = computed(() => {
 });
 
 const [BasicForm, formApi] = useVbenForm({
-  layout: 'vertical',
   commonConfig: {
+    // 默认占满两列
     formItemClass: 'col-span-2',
-    labelWidth: 100,
+    // 默认label宽度 px
+    labelWidth: 80,
+    // 通用配置项 会影响到所有表单项
+    componentProps: {
+      class: 'w-full',
+    },
   },
   schema: modalSchema(),
   showDefaultActions: false,
   wrapperClass: 'grid-cols-2',
 });
+
+async function setupCategorySelect() {
+  const listData = await categoryList();
+  let treeData = listToTree(listData, {
+    id: 'id',
+    pid: 'parentId',
+  });
+  treeData = [
+    {
+      categoryName: '根目录',
+      id: 0,
+      children: treeData,
+    },
+  ];
+  formApi.updateSchema([
+    {
+      fieldName: 'parentId',
+      componentProps: {
+        treeData,
+        treeLine: { showLeafIcon: false },
+        fieldNames: { label: 'categoryName', value: 'id' },
+        treeDefaultExpandAll: true,
+        getPopupContainer,
+      },
+    },
+  ]);
+}
 
 const [BasicModal, modalApi] = useVbenModal({
   fullscreenButton: false,
@@ -37,12 +74,22 @@ const [BasicModal, modalApi] = useVbenModal({
       return null;
     }
     modalApi.modalLoading(true);
-    const { id } = modalApi.getData() as { id?: number | string };
+
+    const { id, parentId } = modalApi.getData() as {
+      id?: number | string;
+      parentId?: number | string;
+    };
     isUpdate.value = !!id;
+
     if (isUpdate.value && id) {
-      const record = await noticeInfo(id);
+      const record = await categoryInfo(id);
       await formApi.setValues(record);
     }
+    if (parentId) {
+      await formApi.setValues({ parentId });
+    }
+    await setupCategorySelect();
+
     modalApi.modalLoading(false);
   },
 });
@@ -54,8 +101,9 @@ async function handleConfirm() {
     if (!valid) {
       return;
     }
+    // getValues获取为一个readonly的对象 需要修改必须先深拷贝一次
     const data = cloneDeep(await formApi.getValues());
-    await (isUpdate.value ? noticeUpdate(data) : noticeAdd(data));
+    await (isUpdate.value ? categoryUpdate(data) : categoryAdd(data));
     emit('reload');
     await handleCancel();
   } catch (error) {
@@ -72,7 +120,7 @@ async function handleCancel() {
 </script>
 
 <template>
-  <BasicModal :fullscreen-button="true" :title="title" class="w-[800px]">
+  <BasicModal :close-on-click-modal="false" :title="title">
     <BasicForm />
   </BasicModal>
 </template>
