@@ -8,7 +8,7 @@ import DictTypePanel from './type/index.vue';
 <template>
   <Page
     :auto-content-height="true"
-    content-class="flex flex-col lg:flex-row gap-4"
+    content-class="flex flex-col lg:flex-row gap-2"
   >
     <DictTypePanel class="flex-1 overflow-hidden" />
     <DictDataPanel class="flex-1 overflow-hidden" />

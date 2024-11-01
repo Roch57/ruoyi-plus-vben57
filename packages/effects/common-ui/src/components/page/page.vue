@@ -69,7 +69,7 @@ onMounted(() => {
         $slots.extra
       "
       ref="headerRef"
-      class="bg-card relative px-6 py-4"
+      class="bg-card relative px-4 py-2"
     >
       <slot name="title">
         <div v-if="title" class="mb-2 flex text-lg font-semibold">
@@ -83,19 +83,19 @@ onMounted(() => {
         </p>
       </slot>
 
-      <div v-if="$slots.extra" class="absolute bottom-4 right-4">
+      <div v-if="$slots.extra" class="absolute bottom-2 right-2">
         <slot name="extra"></slot>
       </div>
     </div>
 
-    <div :class="contentClass" :style="contentStyle" class="h-full p-4">
+    <div :class="contentClass" :style="contentStyle" class="h-full p-2">
       <slot></slot>
     </div>
 
     <div
       v-if="$slots.footer"
       ref="footerRef"
-      class="bg-card align-center absolute bottom-0 left-0 right-0 flex px-6 py-4"
+      class="bg-card align-center absolute bottom-0 left-0 right-0 flex px-4 py-2"
     >
       <slot name="footer"></slot>
     </div>

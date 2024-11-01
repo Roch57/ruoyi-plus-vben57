@@ -61,6 +61,7 @@ function handleImport() {
 const selectDeptId = ref<string[]>([]);
 
 const formOptions: VbenFormProps = {
+  collapsed: true,
   schema: querySchema(),
   commonConfig: {
     labelWidth: 80,

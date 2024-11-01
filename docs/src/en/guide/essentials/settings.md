@@ -243,7 +243,7 @@ const defaultPreferences: Preferences = {
     colorSuccess: 'hsl(144 57% 58%)',
     colorWarning: 'hsl(42 84% 61%)',
     mode: 'dark',
-    radius: '0.5',
+    radius: '0.25',
     semiDarkHeader: false,
     semiDarkSidebar: true,
   },

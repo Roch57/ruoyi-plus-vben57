@@ -207,7 +207,6 @@ async function generateAccess(options: GenerateMenuAndRoutesOptions) {
       const vbenMenuList = backMenuToVbenMenu(backMenuList);
       // 特别注意 这里要深拷贝
       const menuList = [...cloneDeep(localMenuList), ...vbenMenuList];
-      console.log('menuList', menuList);
       return menuList;
     },
     // 可以指定没有权限跳转403页面
