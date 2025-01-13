@@ -105,6 +105,66 @@ const profileRoute: RouteRecordStringComponent[] = [
       },
     ],
   },
+  {
+    component: 'BasicLayout',
+    meta: {
+      hideChildrenInMenu: true,
+      hideInMenu: true,
+      title: '流程设计',
+    },
+    name: 'WorkflowDesigner',
+    path: '/',
+    redirect: '/workflow/designer',
+    children: [
+      {
+        component: '/workflow/components/flow-designer',
+        meta: {
+          activePath: '/workflow/processDefinition',
+          icon: 'eos-icons:role-binding-outlined',
+          keepAlive: true,
+          title: '流程设计',
+        },
+        name: 'WorkflowDesignerIndex',
+        path: '/workflow/designer',
+      },
+    ],
+  },
+  {
+    component: 'BasicLayout',
+    meta: {
+      hideChildrenInMenu: true,
+      hideInMenu: true,
+      title: '请假申请',
+    },
+    name: 'WorkflowLeave',
+    path: '/',
+    redirect: '/workflow/leaveEdit/index',
+    children: [
+      {
+        component: 'workflow/leave/leave-form',
+        meta: {
+          icon: 'eos-icons:role-binding-outlined',
+          keepAlive: true,
+          title: '请假申请',
+          activePath: '/demo/leave',
+        },
+        name: 'WorkflowLeaveIndex',
+        path: '/workflow/leaveEdit/index',
+      },
+    ],
+  },
+  // 这里是iframe使用的 去掉外层的BasicLayout
+  {
+    component: 'workflow/leave/leave-form',
+    meta: {
+      icon: 'eos-icons:role-binding-outlined',
+      keepAlive: true,
+      title: '请假申请',
+      hideInMenu: true,
+    },
+    name: 'WorkflowLeaveInner',
+    path: '/workflow/leaveEdit/index/iframe',
+  },
 ];
 
 /**
