@@ -1,3 +1,10 @@
+# 1.2.1
+
+# BUG FIXES
+
+- 客户端管理 错误的status disabled
+- modal/drawer升级后zIndex(2000)会遮挡Tinymce的下拉框zIndex(1300)
+
 # 1.2.0
 
 **REFACTOR**
