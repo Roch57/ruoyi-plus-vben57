@@ -94,7 +94,7 @@ function createRequestClient(baseURL: string) {
       config.headers['Accept-Language'] = language;
       config.headers['Content-Language'] = language;
       // 添加全局clientId
-      config.headers.clientId = clientId;
+      config.headers.clientid = clientId;
 
       /**
        * 格式化get/delete参数
