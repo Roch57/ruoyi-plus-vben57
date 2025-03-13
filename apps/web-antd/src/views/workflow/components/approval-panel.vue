@@ -1,3 +1,4 @@
+<!-- 该文件需要重构 但我没空 -->
 <script setup lang="ts">
 import type { User } from '#/api/core/user';
 import type { FlowInfoResponse } from '#/api/workflow/instance/model';
@@ -20,7 +21,6 @@ import {
   MenuItem,
   message,
   Modal,
-  Skeleton,
   Space,
   TabPane,
   Tabs,
@@ -40,12 +40,8 @@ import {
 } from '#/api/workflow/task';
 import { renderDict } from '#/utils/render';
 
-import {
-  approvalModal,
-  approvalRejectionModal,
-  ApprovalTimeline,
-  flowInterfereModal,
-} from '.';
+import { approvalModal, approvalRejectionModal, flowInterfereModal } from '.';
+import ApprovalDetails from './approval-details.vue';
 import { approveWithReasonModal } from './helper';
 import userSelectModal from './user-select-modal.vue';
 
@@ -74,6 +70,28 @@ const showMultiActions = computed(() => {
     return true;
   }
   return false;
+});
+
+/**
+ * 按钮权限
+ */
+const buttonPermissions = computed(() => {
+  const record: Record<string, boolean> = {};
+  if (!currentTask.value) {
+    return record;
+  }
+  currentTask.value.buttonList.forEach((item) => {
+    record[item.code] = item.show;
+  });
+  return record;
+});
+
+// 是否显示 `其他` 按钮
+const showButtonOther = computed(() => {
+  const moreCollections = new Set(['addSign', 'subSign', 'transfer', 'trust']);
+  return Object.keys(buttonPermissions.value).some(
+    (key) => moreCollections.has(key) && buttonPermissions.value[key],
+  );
 });
 
 /**
@@ -227,7 +245,15 @@ const [ApprovalModal, approvalModalApi] = useVbenModal({
   connectedComponent: approvalModal,
 });
 function handleApproval() {
-  approvalModalApi.setData({ taskId: props.task?.id });
+  // 是否具有抄送权限
+  const copyPermission = buttonPermissions.value?.copy ?? false;
+  // 是否具有选人权限
+  const assignPermission = buttonPermissions.value?.pop ?? false;
+  approvalModalApi.setData({
+    taskId: props.task?.id,
+    copyPermission,
+    assignPermission,
+  });
   approvalModalApi.open();
 }
 
@@ -408,18 +434,12 @@ async function handleCopy(text: string) {
       </div>
       <Tabs v-if="currentFlowInfo" class="flex-1">
         <TabPane key="1" tab="审批详情">
-          <div class="h-fulloverflow-y-auto">
-            <!-- 约定${task.formPath}/frame 为内嵌表单 用于展示 需要在本地路由添加 -->
-            <iframe
-              v-show="iframeLoaded"
-              :src="`${task.formPath}/iframe?readonly=true&id=${task.businessId}`"
-              :style="{ height: `${iframeHeight}px` }"
-              class="w-full"
-            ></iframe>
-            <Skeleton v-show="!iframeLoaded" :paragraph="{ rows: 6 }" active />
-            <Divider />
-            <ApprovalTimeline :list="currentFlowInfo.list" />
-          </div>
+          <ApprovalDetails
+            :current-flow-info="currentFlowInfo"
+            :iframe-loaded="iframeLoaded"
+            :iframe-height="iframeHeight"
+            :task="task"
+          />
         </TabPane>
         <TabPane key="2" tab="审批流程图">
           <img
@@ -459,10 +479,20 @@ async function handleCopy(text: string) {
         </Space>
         <Space v-if="type === 'approve'">
           <a-button type="primary" @click="handleApproval">通过</a-button>
-          <a-button danger type="primary" @click="handleTermination">
+          <a-button
+            v-if="buttonPermissions?.termination"
+            danger
+            type="primary"
+            @click="handleTermination"
+          >
             终止
           </a-button>
-          <a-button danger type="primary" @click="handleRejection">
+          <a-button
+            v-if="buttonPermissions?.back"
+            danger
+            type="primary"
+            @click="handleRejection"
+          >
             驳回
           </a-button>
           <Dropdown
@@ -471,21 +501,29 @@ async function handleCopy(text: string) {
           >
             <template #overlay>
               <Menu>
-                <MenuItem key="1" @click="() => delegationModalApi.open()">
+                <MenuItem
+                  v-if="buttonPermissions?.trust"
+                  key="1"
+                  @click="() => delegationModalApi.open()"
+                >
                   委托
                 </MenuItem>
-                <MenuItem key="2" @click="() => transferModalApi.open()">
+                <MenuItem
+                  v-if="buttonPermissions?.transfer"
+                  key="2"
+                  @click="() => transferModalApi.open()"
+                >
                   转办
                 </MenuItem>
                 <MenuItem
-                  v-if="showMultiActions"
+                  v-if="showMultiActions && buttonPermissions?.addSign"
                   key="3"
                   @click="() => addSignatureModalApi.open()"
                 >
                   加签
                 </MenuItem>
                 <MenuItem
-                  v-if="showMultiActions"
+                  v-if="showMultiActions && buttonPermissions?.subSign"
                   key="4"
                   @click="() => reductionSignatureModalApi.open()"
                 >
@@ -493,7 +531,7 @@ async function handleCopy(text: string) {
                 </MenuItem>
               </Menu>
             </template>
-            <a-button> 其他 </a-button>
+            <a-button v-if="showButtonOther"> 其他 </a-button>
           </Dropdown>
           <ApprovalModal @complete="$emit('reload')" />
           <RejectionModal @complete="$emit('reload')" />
