@@ -160,7 +160,7 @@ export const drawerSchema: FormSchemaGetter = () => [
     component: 'Textarea',
     defaultValue: '',
     fieldName: 'remark',
-    formItemClass: 'items-baseline col-span-2',
+    formItemClass: 'col-span-2',
     label: '备注',
   },
 ];
@@ -219,7 +219,6 @@ export const authModalSchemas: FormSchemaGetter = () => [
       triggerFields: ['dataScope'],
     },
     fieldName: 'deptIds',
-    formItemClass: 'items-start',
     help: '更改后立即生效',
     label: '部门权限',
   },

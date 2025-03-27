@@ -174,7 +174,9 @@ function handleInfo(row: Required<LeaveForm>) {
               撤销
             </ghost-button>
           </Popconfirm>
-          <ghost-button @click="handleInfo(row)">详情</ghost-button>
+          <ghost-button v-if="row.status !== 'draft'" @click="handleInfo(row)">
+            详情
+          </ghost-button>
           <Popconfirm
             :get-popup-container="getVxePopupContainer"
             placement="left"

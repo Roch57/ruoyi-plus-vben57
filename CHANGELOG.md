@@ -1,3 +1,21 @@
+# 1.2.3
+
+**BUG FIX**
+
+- `withDefaultPlaceholder`中将`placeholder`修改为computed, 解决后续使用`updateSchema`无法正常更新显示placeholder(响应式问题)
+
+- 流程定义 修改accept类型 解决无法拖拽上传
+
+**FEATURES**
+
+- 增加`环境变量`打包配置demo -> build:antd:test
+- 角色管理 勾选权限组件添加对错误用法的校验提示
+
+**REFACTOR**
+
+- OAuth内部逻辑重构 增加新的默认OAuth登录方式
+- 重构部分setup组件为setup语法糖形式
+
 # 1.2.2
 
 **FEATURES**
